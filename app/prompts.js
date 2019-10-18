@@ -24,7 +24,7 @@ module.exports = [
   {
     type: 'list',
     name: 'projectLicense',
-    message: '请选择项目证书类型(ISC):',
+    message: '请选择项目协议(ISC):',
     choices: ['ISC', 'MIT', 'Apache-2.0', 'AGPL-3.0'],
     default: 'ISC'
   },
