@@ -1,6 +1,6 @@
 # generator-antd-custom 脚手架
 
-#### yeoman + download-git-repo + fs-extra + update-notifier
+#### yeoman + download-git-repo + fs-extra + latest-version
 
 
 ---
