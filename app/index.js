@@ -44,6 +44,7 @@ class GeneratorAntdCustom extends Generator {
     // 删除遗留文件
     this._removeDir(path.join(__dirname, 'templates'));
 
+    this.log();
     let spinner = ora(`开始从仓库${chalk.blue(repo_base + repo_github)}下载模板...`);
     spinner.start();
 
@@ -52,7 +53,7 @@ class GeneratorAntdCustom extends Generator {
       download(repo_github, path.join(__dirname, 'templates'), err => err ? reject(err) : resolve());
     }).then(() => {
       spinner.stopAndPersist({
-        symbol: chalk.green('   ✔'),
+        symbol: chalk.green('✔'),
         text: `下载模板${chalk.red('antd-custom')} 成功！`
       });
 
@@ -62,6 +63,7 @@ class GeneratorAntdCustom extends Generator {
       //   this.destinationRoot(this.destinationPath(name));
       // }
 
+      this.log();
       this.log(`开始复制模板...`);
       this._copyDir(path.join(__dirname, 'templates'), this.destinationRoot(name));
 
@@ -115,7 +117,12 @@ class GeneratorAntdCustom extends Generator {
     this._removeDir(path.join(__dirname, 'templates'));
     if (this.success) {
       this.log();
-      this.log(`一切准备就绪！启动项目请手动运行命令：${chalk.yellow('npm start')}`);
+      this.log(`依赖包安装完成！`);
+      this.log();
+      this.log(`一切准备就绪！启动项目步骤如下：`);
+      this.log(`1）进入当前目录：${chalk.yellow(this.props.name)}`);
+      this.log(`2）手动运行命令：${chalk.yellow('npm start')}`);
+      this.log();
       // 正常退出
       process.exit(0);
     }
@@ -125,22 +132,23 @@ class GeneratorAntdCustom extends Generator {
   _checkVersion() {
     this.log(yosay(`欢迎使用 ${chalk.red(pkg.name)} \n脚手架！`));
     this.log();
-    this.log(`正在检查脚手架${chalk.red(pkg.name)}最新版本...`);
+    this.log(`正在检测脚手架${chalk.red(pkg.name)}版本...`);
     this.log();
     let done = this.async();
     latestVersion(pkg.name).then(latest => {
-      const vcur = `(v${pkg.version})`;
-      const vlast = `(v${latest})`;
+      const vcur = `v${pkg.version}`;
+      const vlast = `v${latest}`;
       if (latest != pkg.version) {
         this.npmInstall([pkg.name], { 'global': true });
         this.log(`脚手架${chalk.red(pkg.name)}即将更新版本：${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`);
       } else {
-        this.log(`脚手架${chalk.red(pkg.name)}已是最新版本：${chalk.green(vcur)}`);
+        this.log(`脚手架${chalk.red(pkg.name)}@${chalk.green(pkg.version)}已是最新版本`);
       }
     }).catch(err => {
-      this.log(`脚手架${chalk.red(pkg.name)}检测最新版本异常！${err}`);
+      this.log(`检测脚手架${chalk.red(pkg.name)}版本过程发生异常！${err}`);
       process.exit(1);
     }).finally(() => {
+      this.log();
       done();
     });
   }

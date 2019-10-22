@@ -14,18 +14,18 @@ module.exports = [
   {
     type: 'input',
     name: 'description',
-    message: '请输入项目描述:'
+    message: '请输入项目描述:',
   },
-  {
-    type: 'input',
-    name: 'author',
-    message: '请输入项目作者:',
-  },
-  {
-    type: 'list',
-    name: 'license',
-    message: '请选择项目协议(ISC):',
-    choices: ['ISC', 'MIT', 'Apache-2.0', 'AGPL-3.0'],
-    default: 'ISC'
-  },
+  // {
+  //   type: 'input',
+  //   name: 'author',
+  //   message: '请输入项目作者:',
+  // },
+  // {
+  //   type: 'list',
+  //   name: 'license',
+  //   message: '请选择项目协议(ISC):',
+  //   choices: ['ISC', 'MIT', 'Apache-2.0', 'AGPL-3.0'],
+  //   default: 'ISC'
+  // },
 ]
