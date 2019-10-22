@@ -1,29 +1,29 @@
 module.exports = [
   {
     type: 'input',
-    name: 'projectName',
+    name: 'name',
     message: '请输入项目名称(antd-custom):',
     default: 'antd-custom'
   },
   {
     type: 'input',
-    name: 'projectVersion',
+    name: 'version',
     message: '请输入项目版本号(1.0.0):',
     default: '1.0.0'
   },
   {
     type: 'input',
-    name: 'projectDesc',
+    name: 'description',
     message: '请输入项目描述:'
   },
   {
     type: 'input',
-    name: 'projectAuthor',
+    name: 'author',
     message: '请输入项目作者:',
   },
   {
     type: 'list',
-    name: 'projectLicense',
+    name: 'license',
     message: '请选择项目协议(ISC):',
     choices: ['ISC', 'MIT', 'Apache-2.0', 'AGPL-3.0'],
     default: 'ISC'

@@ -7,14 +7,11 @@ const path = require('path');
 const _ = require('lodash');
 const ora = require('ora');
 const download = require('download-git-repo');
-const deepextend = require('deep-extend');
-const mkdirp = require('mkdirp');
 const fse = require('fs-extra');
 const prompts = require('./prompts');
 const pkg = require('../package.json');
 
 
-const tmpl_path = 'app/templates';
 class GeneratorAntdCustom extends Generator {
   initializing() {
     this.props = {};
@@ -29,7 +26,7 @@ class GeneratorAntdCustom extends Generator {
   }
 
   writing() {
-    const { projectName, projectVersion, projectDesc, projectAuthor, projectLicense } = this.props || {};
+    const { name, version, description, author, license } = this.props || {};
     const repo_base = 'https://github.com/';
     const repo_github = 'ctq123/antd-custom';
 
@@ -46,26 +43,29 @@ class GeneratorAntdCustom extends Generator {
         text: `下载模板${chalk.red('antd-custom')} 成功！`
       });
 
-      // if (path.basename(this.destinationPath()) !== projectName) {
-      //   this.log('正在创建目录' + projectName);
-      //   mkdirp(projectName);
-      //   this.destinationRoot(this.destinationPath(projectName));
+      // if (path.basename(this.destinationPath()) !== name) {
+      //   this.log('正在创建目录' + name);
+      //   mkdirp(name);
+      //   this.destinationRoot(this.destinationPath(name));
       // }
 
-      this._copyDir(path.join(__dirname, 'templates'), this.destinationRoot(projectName));
+      this.log(`开始复制模板...`);
+      this._copyDir(path.join(__dirname, 'templates'), this.destinationRoot(name));
 
       const new_pkg = this.fs.readJSON(this.templatePath('package.json'), {});
-      new_pkg.keywords = (new_pkg.keywords || []);
-      new_pkg.keywords.push(pkg.name)
-      new_pkg.name = projectName;
-      new_pkg.version = projectVersion;
-      new_pkg.description = projectDesc;
-      new_pkg.author = projectAuthor;
-      new_pkg.license = projectLicense;
-      this.fs.writeJSON(this.destinationPath('package.json'), new_pkg);
+      this.fs.writeJSON(this.destinationPath('package.json'), {
+        ...new_pkg,
+        name,
+        version,
+        description,
+        author,
+        license,
+        keywords: [pkg.name]
+      });
 
       this.fs.commit([], ()=>{
-        this.log("复制文件成功")
+        this.log();
+        this.log("复制模板成功！")
         this.success = true;
         done();
       });
@@ -81,7 +81,13 @@ class GeneratorAntdCustom extends Generator {
 
   install() {
     if (this.success) {
-      this.installDependencies()
+      this.log();
+      this.log(`开始安装依赖包...`);
+      this.installDependencies({
+        npm: true,
+        yarn: false,
+        bower: false,
+      })
     }
   }
  
@@ -124,7 +130,7 @@ class GeneratorAntdCustom extends Generator {
   _copyDir(src, dist) {
     fse.copy(src, dist, { filter: this._filterFunc }, err => {
       if (err) {
-        this.log(`复制文件目录失败！${err}`);
+        this.log(`复制模板失败！${err}`);
       }
     });
   }
