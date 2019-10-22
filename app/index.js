@@ -11,30 +11,42 @@ const fse = require('fs-extra');
 const prompts = require('./prompts');
 const pkg = require('../package.json');
 
-
+/**
+ * class函数分两类：
+ * 1.自定义函数，以下划线_开头
+ * 2.生命周期函数（yeoman）
+ */
 class GeneratorAntdCustom extends Generator {
+  // 初始化
   initializing() {
     this.props = {};
     this.success = false;
+    // 检查版本
     this._checkVersion();
   }
 
+  // 用户交互
   prompting() {
+    // 引入交互问题，赋值
     return this.prompt(prompts).then(props => {
       this.props = props;
     });
   }
 
+  // 执行文件动作
   writing() {
     const { name, version, description, author, license } = this.props || {};
     const repo_base = 'https://github.com/';
     const repo_github = 'ctq123/antd-custom';
 
     let done = this.async();
+    // 删除遗留文件
     this._removeDir(path.join(__dirname, 'templates'));
+
     let spinner = ora(`开始从仓库${chalk.blue(repo_base + repo_github)}下载模板...`);
     spinner.start();
 
+    // 下载模板
     new Promise((resolve, reject) => {
       download(repo_github, path.join(__dirname, 'templates'), err => err ? reject(err) : resolve());
     }).then(() => {
@@ -75,10 +87,13 @@ class GeneratorAntdCustom extends Generator {
       spinner.fail();
       this.success = false;
       this.env.error(err);
+      // 异常退出
+      process.exit(1);
     });
     
   }
 
+  // 安装依赖包
   install() {
     if (this.success) {
       this.log();
@@ -91,15 +106,19 @@ class GeneratorAntdCustom extends Generator {
     }
   }
  
+  // 结束
   end() {
+    // 删除遗留文件
     this._removeDir(path.join(__dirname, 'templates'));
     if (this.success) {
       this.log();
       this.log(`一切准备就绪！启动项目请运行命令：${chalk.yellow('npm start')}`);
+      // 正常退出
       process.exit(0);
     }
   }
 
+  // 检查版本
   _checkVersion() {
     const version = `(v${pkg.version})`;
     this.log(yosay(`${chalk.red(pkg.name)}脚手架！`));
@@ -127,6 +146,7 @@ class GeneratorAntdCustom extends Generator {
     }
   }
 
+  // 复制文件/文件夹（异步）
   _copyDir(src, dist) {
     fse.copy(src, dist, { filter: this._filterFunc }, err => {
       if (err) {
@@ -135,6 +155,7 @@ class GeneratorAntdCustom extends Generator {
     });
   }
 
+  // 过滤文件/文件夹
   _filterFunc(src, dist) {
     // console.log("src", src);
     if (src && src.includes('package.json')) {
@@ -143,6 +164,7 @@ class GeneratorAntdCustom extends Generator {
     return true;
   }
 
+  // 删除文件/文件夹（同步）
   _removeDir(src) {
     fse.removeSync(src);
   }
