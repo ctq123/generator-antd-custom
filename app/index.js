@@ -9,6 +9,7 @@ const _ = require('lodash');
 const ora = require('ora');
 const download = require('download-git-repo');
 const fse = require('fs-extra');
+const execSync = require('child_process').execSync;
 const prompts = require('./prompts');
 const pkg = require('../package.json');
 
@@ -132,20 +133,29 @@ class GeneratorAntdCustom extends Generator {
   _checkVersion() {
     this.log(yosay(`欢迎使用 ${chalk.red(pkg.name)} \n脚手架！`));
     this.log();
-    this.log(`正在检测脚手架${chalk.red(pkg.name)}版本...`);
-    this.log();
     let done = this.async();
+    let spinner = ora(`正在检测脚手架${chalk.red(pkg.name)}最新版本`).start();
     latestVersion(pkg.name).then(latest => {
       const vcur = `v${pkg.version}`;
       const vlast = `v${latest}`;
       if (latest != pkg.version) {
-        this.npmInstall([pkg.name], { 'global': true });
-        this.log(`脚手架${chalk.red(pkg.name)}即将更新版本：${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`);
+        spinner.stop();
+        // this.npmInstall([pkg.name], { 'global': true });
+        spinner = ora(`脚手架${chalk.red(pkg.name)}正在更新版本：${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`).start();
+        execSync(`npm i ${pkg.name} -g`);
+        spinner.stopAndPersist({
+          symbol: chalk.green('✔'),
+          text: `脚手架${chalk.red(pkg.name)}更新版本成功！${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`
+        });
       } else {
-        this.log(`脚手架${chalk.red(pkg.name)}@${chalk.green(pkg.version)}已是最新版本`);
+        spinner.stopAndPersist({
+          symbol: chalk.green('✔'),
+          text: `当前脚手架${chalk.red(pkg.name)}@${chalk.green(pkg.version)}已是最新版本`
+        });
       }
     }).catch(err => {
       this.log(`检测脚手架${chalk.red(pkg.name)}版本过程发生异常！${err}`);
+      spinner && spinner.fail();
       process.exit(1);
     }).finally(() => {
       this.log();
