@@ -1,5 +1,6 @@
 const Generator = require('yeoman-generator');
 const updateNotifier = require('update-notifier');
+const latestVersion = require('latest-version');
 const chalk = require('chalk');
 const yosay = require('yosay');
 const beeper = require('beeper');
@@ -64,6 +65,7 @@ class GeneratorAntdCustom extends Generator {
       this.log(`开始复制模板...`);
       this._copyDir(path.join(__dirname, 'templates'), this.destinationRoot(name));
 
+      // 这种方式不需要在package.json中提前定义变量
       const new_pkg = this.fs.readJSON(this.templatePath('package.json'), {});
       this.fs.writeJSON(this.destinationPath('package.json'), {
         ...new_pkg,
@@ -75,6 +77,7 @@ class GeneratorAntdCustom extends Generator {
         keywords: [pkg.name]
       });
 
+      // 提交缓存，使package.json生效，不再提出询问是否覆盖
       this.fs.commit([], ()=>{
         this.log();
         this.log("复制模板成功！")
@@ -102,7 +105,7 @@ class GeneratorAntdCustom extends Generator {
         npm: true,
         yarn: false,
         bower: false,
-      })
+      });
     }
   }
  
@@ -112,7 +115,7 @@ class GeneratorAntdCustom extends Generator {
     this._removeDir(path.join(__dirname, 'templates'));
     if (this.success) {
       this.log();
-      this.log(`一切准备就绪！启动项目请运行命令：${chalk.yellow('npm start')}`);
+      this.log(`一切准备就绪！启动项目请手动运行命令：${chalk.yellow('npm start')}`);
       // 正常退出
       process.exit(0);
     }
@@ -120,48 +123,34 @@ class GeneratorAntdCustom extends Generator {
 
   // 检查版本
   _checkVersion() {
-    const version = `(v${pkg.version})`;
-    this.log(yosay(`${chalk.red(pkg.name)}脚手架！`));
+    this.log(yosay(`欢迎使用 ${chalk.red(pkg.name)} \n脚手架！`));
     this.log();
     this.log(`正在检查脚手架${chalk.red(pkg.name)}最新版本...`);
-    const notifier = updateNotifier({
-      pkg,
-      updateCheckInterval: 0
+    this.log();
+    let done = this.async();
+    latestVersion(pkg.name).then(latest => {
+      const vcur = `(v${pkg.version})`;
+      const vlast = `(v${latest})`;
+      if (latest != pkg.version) {
+        this.npmInstall([pkg.name], { 'global': true });
+        this.log(`脚手架${chalk.red(pkg.name)}即将更新版本：${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`);
+      } else {
+        this.log(`脚手架${chalk.red(pkg.name)}已是最新版本：${chalk.green(vcur)}`);
+      }
+    }).catch(err => {
+      this.log(`脚手架${chalk.red(pkg.name)}检测最新版本异常！${err}`);
+      process.exit(1);
+    }).finally(() => {
+      done();
     });
-    notifier.notify();
-    if (notifier.update) {
-      // 更新脚手架
-      this.log();
-      // this.log(`npm i -g ${pkg.name}`);
-      this.npmInstall([pkg.name], { '-g': true });
-      beeper();
-
-      // 打印更新的信息
-      const { current, latest, name } = notifier.update;
-      const vcurrent = `v${current}`;
-      const vlatest = `v${latest}`;
-      this.log(`更新脚手架${chalk.red(name)}版本成功：${chalk.yellow(vcurrent)} -> ${chalk.green(vlatest)}`);
-    } else {
-      this.log(`脚手架${chalk.red(pkg.name)}已是最新版本：${chalk.green(version)}`);
-    }
   }
 
   // 复制文件/文件夹（异步）
   _copyDir(src, dist) {
-    fse.copy(src, dist, { filter: this._filterFunc }, err => {
-      if (err) {
-        this.log(`复制模板失败！${err}`);
-      }
-    });
-  }
-
-  // 过滤文件/文件夹
-  _filterFunc(src, dist) {
-    // console.log("src", src);
-    if (src && src.includes('package.json')) {
-      return false;
-    }
-    return true;
+    fse.copy(src, dist, 
+      { filter: (item) => !(item || '').includes('package.json') }, 
+      err => { err && this.log(`复制模板失败！${err}`)}
+    );
   }
 
   // 删除文件/文件夹（同步）
