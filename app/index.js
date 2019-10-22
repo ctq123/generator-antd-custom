@@ -34,12 +34,12 @@ class GeneratorAntdCustom extends Generator {
     const repo_github = 'ctq123/antd-custom';
 
     let done = this.async();
-    this._removeDir(tmpl_path);
+    this._removeDir(path.join(__dirname, 'templates'));
     let spinner = ora(`开始从仓库${chalk.blue(repo_base + repo_github)}下载模板...`);
     spinner.start();
 
     new Promise((resolve, reject) => {
-      download(repo_github, tmpl_path, err => err ? reject(err) : resolve());
+      download(repo_github, path.join(__dirname, 'templates'), err => err ? reject(err) : resolve());
     }).then(() => {
       spinner.stopAndPersist({
         symbol: chalk.green('   ✔'),
@@ -52,23 +52,19 @@ class GeneratorAntdCustom extends Generator {
       //   this.destinationRoot(this.destinationPath(projectName));
       // }
 
-      this._copyDir(tmpl_path, projectName);
+      this._copyDir(path.join(__dirname, 'templates'), this.destinationRoot(projectName));
 
-      this.fs.copyTpl(
-        this.templatePath('package.json'),
-        this.destinationPath('package.json'),
-        {
-          name: projectName,
-          version: projectVersion,
-          description: projectDesc,
-          author: projectAuthor,
-          license: projectLicense,
-          keywords: [pkg.name]
-        }
-      )
+      const new_pkg = this.fs.readJSON(this.templatePath('package.json'), {});
+      new_pkg.keywords = (new_pkg.keywords || []);
+      new_pkg.keywords.push(pkg.name)
+      new_pkg.name = projectName;
+      new_pkg.version = projectVersion;
+      new_pkg.description = projectDesc;
+      new_pkg.author = projectAuthor;
+      new_pkg.license = projectLicense;
+      this.fs.writeJSON(this.destinationPath('package.json'), new_pkg);
 
       this.fs.commit([], ()=>{
-        this.destinationRoot(this.destinationPath(projectName));
         this.log("复制文件成功")
         this.success = true;
         done();
@@ -81,29 +77,6 @@ class GeneratorAntdCustom extends Generator {
       this.env.error(err);
     });
     
-    // // 检测并创建目录
-    // if (path.basename(this.destinationPath()) !== projectName) {
-    //   this.log(
-    //     '正在创建目录' + projectName
-    //   );
-    //   mkdirp(projectName);
-    //   this.destinationRoot(this.destinationPath(projectName));
-    // }
-
-    // // 创建src目录
-    // mkdirp('src');
-
-    // // 复制webpack.config.js
-    // this.fs.copy(
-    //   this.templatePath('webpack_tmpl.config.js'),
-    //   this.destinationPath('webpack.config.js')
-    // );
-
-    // // 复制index.js
-    // this.fs.copy(
-    //   this.templatePath('index_tmpl.js'),
-    //   this.destinationPath('src/index.js')
-    // )
   }
 
   install() {
@@ -113,10 +86,11 @@ class GeneratorAntdCustom extends Generator {
   }
  
   end() {
-    this._removeDir(tmpl_path);
+    this._removeDir(path.join(__dirname, 'templates'));
     if (this.success) {
       this.log();
       this.log(`一切准备就绪！启动项目请运行命令：${chalk.yellow('npm start')}`);
+      process.exit(0);
     }
   }
 
@@ -164,11 +138,7 @@ class GeneratorAntdCustom extends Generator {
   }
 
   _removeDir(src) {
-    fse.remove(src, err => {
-      if (err) {
-        this.log(`删除文件目录失败！${err}`);
-      }
-    });
+    fse.removeSync(src);
   }
 
 };
