@@ -11,11 +11,11 @@ module.exports = [
     message: '请输入项目版本号(1.0.0):',
     default: '1.0.0'
   },
-  // {
-  //   type: 'input',
-  //   name: 'description',
-  //   message: '请输入项目描述:',
-  // },
+  {
+    type: 'input',
+    name: 'description',
+    message: '请输入项目描述:',
+  },
   // {
   //   type: 'input',
   //   name: 'author',

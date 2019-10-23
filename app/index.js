@@ -147,6 +147,12 @@ class GeneratorAntdCustom extends Generator {
           symbol: chalk.green('✔'),
           text: `脚手架${chalk.red(pkg.name)}更新版本成功！${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`
         });
+        // 正常退出
+        process.exit(0);
+        // 重新运行命令
+        this.log();
+        this.log(`请重新运行命令：${chalk.yellow('yo antd-custom')}`);
+        this.log();
       } else {
         spinner.stopAndPersist({
           symbol: chalk.green('✔'),
