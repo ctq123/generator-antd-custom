@@ -139,20 +139,14 @@ class GeneratorAntdCustom extends Generator {
       const vcur = `v${pkg.version}`;
       const vlast = `v${latest}`;
       if (latest != pkg.version) {
-        spinner.stop();
-        // this.npmInstall([pkg.name], { 'global': true });
-        spinner = ora(`脚手架${chalk.red(pkg.name)}正在更新版本：${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`).start();
-        execSync(`npm i ${pkg.name} -g`);
+        // 将会在install()生命周期中执行
+        this.npmInstall([pkg.name], { 'global': true });
+        // // 当前同步强制执行
+        // execSync(`npm i ${pkg.name} -g`);
         spinner.stopAndPersist({
-          symbol: chalk.green('✔'),
-          text: `脚手架${chalk.red(pkg.name)}更新版本成功！${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`
+          symbol: chalk.yellow('✔'),
+          text: `本次运行结束后，脚手架${chalk.red(pkg.name)}将自动升级：${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`
         });
-        // 正常退出
-        process.exit(0);
-        // 重新运行命令
-        this.log();
-        this.log(`请重新运行命令：${chalk.yellow('yo antd-custom')}`);
-        this.log();
       } else {
         spinner.stopAndPersist({
           symbol: chalk.green('✔'),
