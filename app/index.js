@@ -13,6 +13,7 @@ const execSync = require('child_process').execSync;
 const prompts = require('./prompts');
 const pkg = require('../package.json');
 
+let spinner = ora(`开始下载模板...`)
 /**
  * class函数分两类：
  * 1.自定义函数，以下划线_开头
@@ -46,17 +47,14 @@ class GeneratorAntdCustom extends Generator {
     this._removeDir(path.join(__dirname, 'templates'));
 
     this.log();
-    let spinner = ora(`开始从仓库${chalk.blue(repo_base + repo_github)}下载模板...`);
-    spinner.start();
+    spinner.start(`开始从仓库${chalk.blue(repo_base + repo_github)}下载模板...`);
 
     // 下载模板
     new Promise((resolve, reject) => {
       download(repo_github, path.join(__dirname, 'templates'), err => err ? reject(err) : resolve());
     }).then(() => {
-      spinner.stopAndPersist({
-        symbol: chalk.green('✔'),
-        text: `下载模板${chalk.red('antd-custom')} 成功！`
-      });
+      spinner.succeed(`下载模板${chalk.red('antd-custom')} 成功！`);
+      spinner.stop();
 
       // if (path.basename(this.destinationPath()) !== name) {
       //   this.log('正在创建目录' + name);
@@ -80,17 +78,29 @@ class GeneratorAntdCustom extends Generator {
         keywords: [pkg.name]
       });
 
+      // 复制.gitignore，隐藏文件必须手动复制
+      this.fs.copy(
+        this.templatePath('.gitignore'),
+        this.destinationPath('.gitignore')
+      );
+
+      // 复制.babelrc，隐藏文件必须手动复制
+      this.fs.copy(
+        this.templatePath('.babelrc'),
+        this.destinationPath('.babelrc')
+      );
+
       // 提交缓存，使package.json生效，不再提出询问是否覆盖
       this.fs.commit([], ()=>{
-        this.log();
-        this.log("复制模板成功！")
         this.success = true;
+        this.log();
+        this.log(`复制模板成功！`);
         done();
       });
 
     }).catch(err => {
-      this.log(`模板操作失败！` + chalk.red(err));
-      spinner.fail();
+      spinner.stop();
+      this.log(`模板操作失败！`);
       this.success = false;
       this.env.error(err);
       // 异常退出
@@ -102,13 +112,9 @@ class GeneratorAntdCustom extends Generator {
   // 安装依赖包
   install() {
     if (this.success) {
+      this.installDependencies({ bower: false });
+      this.log(`开始安装项目依赖包...`);
       this.log();
-      this.log(`开始安装依赖包...`);
-      this.installDependencies({
-        npm: true,
-        yarn: false,
-        bower: false,
-      });
     }
   }
  
@@ -118,7 +124,7 @@ class GeneratorAntdCustom extends Generator {
     this._removeDir(path.join(__dirname, 'templates'));
     if (this.success) {
       this.log();
-      this.log(`依赖包安装完成！`);
+      this.log(`项目依赖包安装完成！`);
       this.log();
       this.log(`一切准备就绪！启动项目步骤如下：`);
       this.log(`1）进入当前目录：${chalk.yellow(this.props.name)}`);
@@ -134,7 +140,7 @@ class GeneratorAntdCustom extends Generator {
     this.log(yosay(`欢迎使用 ${chalk.red(pkg.name)} \n脚手架！`));
     this.log();
     let done = this.async();
-    let spinner = ora(`正在检测脚手架${chalk.red(pkg.name)}最新版本`).start();
+    spinner.start(`正在检测脚手架${chalk.red(pkg.name)}最新版本`);
     latestVersion(pkg.name).then(latest => {
       const vcur = `v${pkg.version}`;
       const vlast = `v${latest}`;
@@ -143,22 +149,17 @@ class GeneratorAntdCustom extends Generator {
         this.npmInstall([pkg.name], { 'global': true });
         // // 当前同步强制执行
         // execSync(`npm i ${pkg.name} -g`);
-        spinner.stopAndPersist({
-          symbol: chalk.yellow('✔'),
-          text: `本次运行结束后，脚手架${chalk.red(pkg.name)}将自动升级：${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`
-        });
+        spinner.succeed(`本次运行结束后，脚手架${chalk.red(pkg.name)}将自动升级：${chalk.yellow(vcur)} -> ${chalk.green(vlast)}`);
       } else {
-        spinner.stopAndPersist({
-          symbol: chalk.green('✔'),
-          text: `当前脚手架${chalk.red(pkg.name)}@${chalk.green(pkg.version)}已是最新版本`
-        });
+        spinner.succeed(`当前脚手架${chalk.red(pkg.name)}@${chalk.green(pkg.version)}已是最新版本`);
       }
     }).catch(err => {
-      this.log(`检测脚手架${chalk.red(pkg.name)}版本过程发生异常！${err}`);
-      spinner && spinner.fail();
+      spinner.succeed(`检测脚手架${chalk.red(pkg.name)}版本过程发生异常！`);
+      this.log(`${chalk.red(err)}`);
       process.exit(1);
     }).finally(() => {
       this.log();
+      spinner.stop();
       done();
     });
   }
@@ -167,7 +168,7 @@ class GeneratorAntdCustom extends Generator {
   _copyDir(src, dist) {
     fse.copy(src, dist, 
       { filter: (item) => !(item || '').includes('package.json') }, 
-      err => { err && this.log(`复制模板失败！${err}`)}
+      err => { err && this.log(`复制模板失败！${chalk.red(err)}`)}
     );
   }
 
