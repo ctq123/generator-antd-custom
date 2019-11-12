@@ -9,6 +9,14 @@
 
 使用yeoman框架，实现ant-custom项目脚手架，同时校验脚手架的最新版本并更新
 
+## 分支
+master 稳定版本
+
+develop 开发版本
+
+test yeoman命令版本 
+
+
 ## 安装
 
 ```bash
