@@ -3,6 +3,7 @@ const path = require('path')
 const { execSync } = require('child_process')
 const rootDir = require('osenv').home()
 const mkdirp = require('mkdirp')
+const requireFrom = require('import-from').silent
 const ora = require('ora')
 const chalk = require('chalk')
 const cmdDir = 'cmd'
@@ -27,6 +28,8 @@ class Cli {
     this.pkg = pkg
     this.ora = ora('')
     this.tmplDir = path.resolve(rootDir, '.tmpl')
+    this.fs = fs
+    this.path = path
   }
 
   /**
@@ -58,6 +61,55 @@ class Cli {
     if (!npm) return
     const cmd = `${npm} --registry=https://registry.npmjs.org`
     return options ? execSync(cmd, options) : execSync(cmd)
+  }
+
+  /**
+   * 提取package.json文件
+   * @param {*} dir 
+   */
+  getPackageFile(dir) {
+    const p = path.resolve(dir, 'package.json')
+    return fs.existsSync(p) ? require(p) : null
+  }
+
+  /**
+   * 获取依赖包安装状态
+   * 0: 未安装； 1: 版本落后； 2: 最新版本
+   * @param {*} pkgName 
+   * @param {*} dir 
+   */
+  getPackageStatus(pkgName, dir) {
+    const des = (this.getPackageFile(dir) || {}).dependencies
+    if (!des || !des[pkgName]) return 0
+    const lastv = this.npmExecSync(`npm view ${pkgName} version`) + ''
+    const curv = requireFrom(dir, path.join(pkgName, 'package.json')).version
+    return lastv.trim() === curv ? 2 : 1
+  }
+
+  /**
+   * 运行项目命令，如启动或打包等
+   * @param {*} cmdStr 
+   */
+  runScriptCmd(cmdStr='') {
+    try {
+      if (!cmdStr) throw Error('运行命令不能为空')
+      let msg = '运行命令'
+      // 提取当前目录package.json命令
+      const cwd = process.cwd()
+      const pkg = this.getPackageFile(cwd)
+      const { scripts } = pkg || {}
+
+      msg = cmdStr.startsWith('start') ? '项目启动' : msg
+      msg = cmdStr.startsWith('build') ? '项目打包' : msg
+      
+      if (!pkg) throw Error(`${msg}失败！当前目录不存在package.json，请确认当前目录是否为工程目录`)
+      if (!scripts || !scripts[cmdStr]) throw Error(`${msg}失败！当前目录下package.json的scripts中不存在 ${cmdStr} 命令`)
+      // 运行项目命令
+      this.npmExecSync(`npm run ${scripts[cmdStr]}`, { cwd })
+
+    } catch(e) {
+      this.log(e, 'red')
+    }
   }
 
   /**

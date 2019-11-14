@@ -1,6 +1,3 @@
-const fs = require('fs')
-const path = require('path')
-const requireFrom = require('import-from').silent
 const resolveFrom = require('resolve-from').silent
 const inquirer = require('inquirer')
 const yoEnv = require('yeoman-environment').createEnv()
@@ -15,15 +12,6 @@ const getRealTmplName = (name) => {
       return ''
   }
 }
-
-const getInstallStatus = (name, dir, npmExecSync) => {
-  const des = (require(path.resolve(__dirname, dir, 'package.json')) || {}).dependencies
-  if (!des || !des[name]) return 0
-  const lastv = npmExecSync(`npm view ${name} version`) + ''
-  const curv = requireFrom(dir, path.join(name, 'package.json')).version
-  return lastv.trim() === curv ? 2 : 1
-}
-
 
 /**
  * cfe init 
@@ -48,7 +36,7 @@ module.exports = async function(name) {
       this.log('初始化命令非法！尝试使用 cfe init ，查看更多 cfe -h')
       return
     }
-    const status = getInstallStatus(realTmpl, this.tmplDir, this.npmExecSync)
+    const status = this.getPackageStatus(realTmpl, this.tmplDir)
     switch(status) {
       case 0: // 没安装
         await install.call(this, realTmpl)
