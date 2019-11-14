@@ -29,14 +29,14 @@ $ cfe init react
 ## 运行项目
 
 ```bash
-$ npm start
+$ cfe start
 ```
 ## 打包项目
 
 ```bash
-$ npm run build:test
+$ cfe build test
 ```
 or
 ```bash
-$ npm run build:prod
+$ cfe build prod
 ```
