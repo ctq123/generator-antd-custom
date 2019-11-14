@@ -1,13 +1,10 @@
 # generator-antd-custom 脚手架
 
-#### yeoman + download-git-repo + fs-extra + latest-version
-
-
 ---
 
 ## 说明
 
-使用yeoman框架，实现ant-custom项目脚手架，同时校验脚手架的最新版本并更新
+对之前的版本升级改造，实现自定义命令行，配合antd-custom-tpl模板运行
 
 ## 分支
 master 稳定版本
@@ -20,14 +17,13 @@ test yeoman命令版本
 ## 安装
 
 ```bash
-$ npm i yo -g
 $ npm i generator-antd-custom -g
 
 ```
 
 ## 初始化项目
 ```bash
-$ yo antd-custom
+$ cfe init react
 ```
 
 ## 运行项目

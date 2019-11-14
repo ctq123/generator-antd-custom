@@ -56,7 +56,7 @@ class Cli {
    */
   npmExecSync(npm, options='') {
     if (!npm) return
-    const cmd = `${npm} --registry=https://registry.npm.taobao.org`
+    const cmd = `${npm} --registry=https://registry.npmjs.org`
     return options ? execSync(cmd, options) : execSync(cmd)
   }
 
@@ -74,7 +74,7 @@ class Cli {
    * @param {*} str 
    * @param {*} color 
    */
-  log(str, color='yellow') {
+  log(str='', color='yellow') {
     const co = chalk[color] || chalk.yellow
     console.log(co(str))
   }

@@ -10,22 +10,16 @@ const getRealTmplName = (name) => {
   switch(name) {
     case 'react':
     case '@cf/react-tpl':
-      return '@cf/react-tpl'
+      return 'antd-custom-tpl'
     default:
       return ''
   }
 }
 
-const getDependencies = (dir) => {
-  const p = path.resolve(dir, 'package.json')  
-  if (!fs.existsSync(p)) return {}
-  return require(p).dependencies || {}
-}
-
-const getInstallStatus = (name, dir) => {
-  const des = getDependencies(dir)
-  if (!des[name]) return 0
-  const lastv = this.npmExecSync(`npm view ${name} version`) + ''
+const getInstallStatus = (name, dir, npmExecSync) => {
+  const des = (require(path.resolve(__dirname, dir, 'package.json')) || {}).dependencies
+  if (!des || !des[name]) return 0
+  const lastv = npmExecSync(`npm view ${name} version`) + ''
   const curv = requireFrom(dir, path.join(name, 'package.json')).version
   return lastv.trim() === curv ? 2 : 1
 }
@@ -54,7 +48,7 @@ module.exports = async function(name) {
       this.log('初始化命令非法！尝试使用 cfe init ，查看更多 cfe -h')
       return
     }
-    const status = getInstallStatus(realTmpl, this.tmplDir)
+    const status = getInstallStatus(realTmpl, this.tmplDir, this.npmExecSync)
     switch(status) {
       case 0: // 没安装
         await install.call(this, realTmpl)
@@ -69,10 +63,10 @@ module.exports = async function(name) {
     
     // 调用项目模版命令yoeman
     yoEnv.register(resolveFrom(this.tmplDir, realTmpl), realTmpl)
-    yoEnv.run(realTmpl, (e, d) => {
-      d && this.log('this.yoEnv.run test', 'green')
-    })
+    yoEnv.run(realTmpl)
 
-  } catch(e) {}
+  } catch(e) {
+    this.log(e, 'red')
+  }
   
 }
