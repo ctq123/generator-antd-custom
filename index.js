@@ -105,7 +105,7 @@ class Cli {
       if (!pkg) throw Error(`${msg}失败！当前目录不存在package.json，请确认当前目录是否为工程目录`)
       if (!scripts || !scripts[cmdStr]) throw Error(`${msg}失败！当前目录下package.json的scripts中不存在 ${cmdStr} 命令`)
       // 运行项目命令
-      this.npmExecSync(`npm run ${scripts[cmdStr]}`, { cwd })
+      this.npmExecSync(`npm run ${cmdStr}`, { cwd })
 
     } catch(e) {
       this.log(e, 'red')
