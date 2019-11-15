@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { execSync } = require('child_process')
+const { execSync, exec } = require('child_process')
 const rootDir = require('osenv').home()
 const mkdirp = require('mkdirp')
 const requireFrom = require('import-from').silent
@@ -62,6 +62,18 @@ class Cli {
     if (!npm) return
     const cmd = `${npm} --registry=https://registry.npmjs.org`
     return options ? execSync(cmd, options) : execSync(cmd)
+  }
+
+    /**
+   * 异步执行npm命令
+   * @param {*} npm 
+   * @param {*} options
+   * @param {*} cb 
+   */
+  npmExec(npm, options={}, cb=() => {}) {
+    if (!npm) return
+    const cmd = `${npm} --registry=http://cfnpm.dev.yuceyi.com:4873/`
+    exec(cmd, options, cb)
   }
 
   /**

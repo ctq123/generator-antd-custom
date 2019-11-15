@@ -5,15 +5,16 @@
 module.exports = async function(name) {
   name = name || process.argv[3]
   if (!name) return
-  this.spinner(`正在安装 ${name} ...`)
-  this.log()
-  try {
-    this.npmExecSync(`npm i ${name}@latest -S`, { cwd: this.tmplDir })
+  new Promise((resolve, reject) => {
+    this.spinner(`正在安装 ${name} ...`, 'start')
+    this.npmExec(`npm i ${name}@latest -S`, { cwd: this.tmplDir }, err => err ? reject(err) : resolve())
+  }).then(resp => {
     this.spinner(`${name}安装完成`, 'succeed')
-  } catch(e) {
+  }).catch(e => {
     this.spinner(`${name}安装失败，请检查包名称是否正确`, 'fail')
-  } finally {
+    this.log(e, 'red')
+  }).finally(() => {
     this.spinner('', 'stop')
-  }
+  })
 
 }
