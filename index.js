@@ -6,6 +6,7 @@ const mkdirp = require('mkdirp')
 const requireFrom = require('import-from').silent
 const ora = require('ora')
 const chalk = require('chalk')
+const shell = require('shelljs')
 const cmdDir = 'cmd'
 const pkg = require('./package.json')
 
@@ -88,6 +89,7 @@ class Cli {
 
   /**
    * 运行项目命令，如启动或打包等
+   * 注意：用子进程child_process.exec调用npm，不会打印日志，这里采用shell命令调用项目命令
    * @param {*} cmdStr 
    */
   runScriptCmd(cmdStr='') {
@@ -104,9 +106,9 @@ class Cli {
       
       if (!pkg) throw Error(`${msg}失败！当前目录不存在package.json，请确认当前目录是否为工程目录`)
       if (!scripts || !scripts[cmdStr]) throw Error(`${msg}失败！当前目录下package.json的scripts中不存在 ${cmdStr} 命令`)
-      // 运行项目命令
-      this.npmExecSync(`npm run ${cmdStr}`, { cwd })
-
+      // 通过shell运行项目命令
+      shell.exec(`npm run ${cmdStr}`, { async: true })
+      process.exitCode = 0
     } catch(e) {
       this.log(e, 'red')
     }
