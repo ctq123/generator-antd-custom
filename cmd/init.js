@@ -7,8 +7,8 @@ const reactApp = 'react:app'
 const getRealTmplName = (name) => {
   switch(name) {
     case 'react':
-    case '@cf/react-tpl':
-      return '@cf/react-tpl'
+    case 'antd-custom-tpl':
+      return 'antd-custom-tpl'
     default:
       return ''
   }
