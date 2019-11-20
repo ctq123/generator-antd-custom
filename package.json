@@ -1,6 +1,6 @@
 {
   "name": "generator-antd-custom",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "description": "generator-antd-custom脚手架，快速搭建新项目",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,10 @@
   },
   "bin": {
     "cfe": "./bin/cfe.js"
+  },
+  "react:app": {
+    "resolved": "./tpl/react-tpl.js",
+    "namespace": "react:app"
   },
   "repository": {
     "type": "git",
@@ -17,6 +21,7 @@
     "cli",
     "脚手架",
     "antd-custom",
+    "antd-custom-tpl",
     "yeoman-generator"
   ],
   "author": "ctq123",
@@ -35,6 +40,6 @@
     "resolve-from": "^5.0.0",
     "shelljs": "^0.8.3",
     "yeoman-environment": "^2.6.0",
-    "yosay": "^2.0.2"
+    "yeoman-generator": "^4.2.0"
   }
 }

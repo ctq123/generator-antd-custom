@@ -1,3 +1,5 @@
+#!usr/bin/env node
+
 const fs = require('fs')
 const path = require('path')
 const { execSync, exec } = require('child_process')
@@ -54,26 +56,27 @@ class Cli {
   }
 
   /**
-   * 执行npm命令
+   * 同步执行npm命令
    * @param {*} npm 
    * @param {*} options 
    */
   npmExecSync(npm, options='') {
     if (!npm) return
-    const cmd = `${npm} --registry=https://registry.npmjs.org`
+    const cmd = `${npm} --registry=https://registry.npm.taobao.org/`
     return options ? execSync(cmd, options) : execSync(cmd)
   }
 
-    /**
-   * 异步执行npm命令
+  /**
+   * shell安装npm命令
+   * 区别child_process.exec：child_process.exec需要在callback中回调打印日志信息
    * @param {*} npm 
    * @param {*} options
    * @param {*} cb 
    */
-  npmExec(npm, options={}, cb=() => {}) {
+  shellInstall(npm, options={}) {
     if (!npm) return
-    const cmd = `${npm} --registry=http://cfnpm.dev.yuceyi.com:4873/`
-    exec(cmd, options, cb)
+    const cmd = `${npm} --registry=https://registry.npm.taobao.org/`
+    shell.exec(cmd, { ...options })
   }
 
   /**

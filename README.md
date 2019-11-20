@@ -4,9 +4,7 @@
 
 ## 说明
 
-generator-antd-custom 脚手架，用于快递搭建新项目，实现自定义命令行，配合antd-custom-tpl模板运行，实现模版和脚手架分离，暂时只提供一个antd-custom-tpl项目模版，后续可以加入其他更多模版
-
-参考：https://mp.weixin.qq.com/s/cfFUJ_v86MNUHcfzGqva2w
+generator-antd-custom 脚手架，用于快递搭建新项目，实现自定义命令行，配合antd-custom-tpl模板运行，实现模版和脚手架分离，暂时只提供一个react项目模版，后续可以加入其他更多模版
 
 ## 分支
 master 稳定版本

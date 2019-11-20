@@ -1,13 +1,14 @@
-const resolveFrom = require('resolve-from').silent
 const inquirer = require('inquirer')
-const yoEnv = require('yeoman-environment').createEnv()
+const env = require('yeoman-environment').createEnv()
 const install = require('./install')
+const reactTpl = require('../tpl/react-tpl')
+const reactApp = 'react:app'
 
 const getRealTmplName = (name) => {
   switch(name) {
     case 'react':
     case '@cf/react-tpl':
-      return 'antd-custom-tpl'
+      return '@cf/react-tpl'
     default:
       return ''
   }
@@ -50,8 +51,8 @@ module.exports = async function(name) {
     }
     
     // 调用项目模版命令yoeman
-    yoEnv.register(resolveFrom(this.tmplDir, realTmpl), realTmpl)
-    yoEnv.run(realTmpl)
+    env.registerStub(reactTpl, reactApp)
+    env.run(reactApp)
 
   } catch(e) {
     this.log(e, 'red')
