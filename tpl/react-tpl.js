@@ -7,7 +7,7 @@ const rootDir = require('osenv').home()
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts)
-    this.tmplDir = path.resolve(rootDir, '.tmpl/node_modules/@cf/react-tpl/templates')
+    this.tmplDir = path.resolve(rootDir, '.tmpl/node_modules/antd-custom-tpl/templates')
   }
 
   prompting() {

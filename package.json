@@ -1,6 +1,6 @@
 {
   "name": "generator-antd-custom",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "generator-antd-custom脚手架，快速搭建新项目",
   "main": "index.js",
   "scripts": {
