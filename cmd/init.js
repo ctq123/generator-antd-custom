@@ -24,7 +24,7 @@ module.exports = async function(name) {
     // 校验版本
     this.checkVersion()
     // 生成临时目录
-    this.mkTmplDir()
+    await this.mkTmplDir()
 
     // 安装项目模版
     name = name || process.argv[3]

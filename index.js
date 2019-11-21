@@ -38,11 +38,15 @@ class Cli {
   /**
    * 创建模版临时仓
    */
-  mkTmplDir() {
-    mkdirp(this.tmplDir)
-    const tpkg = path.resolve(this.tmplDir, 'package.json')
-    if (!fs.existsSync(tpkg)) {
-      fs.writeFileSync(tpkg, JSON.stringify({ name: '_', description: '_', repository: '_', license: 'MIT' }))
+  async mkTmplDir() {
+    try {
+      mkdirp(this.tmplDir)
+      const tpkg = path.resolve(this.tmplDir, 'package.json')
+      if (!fs.existsSync(tpkg)) {
+        fs.writeFileSync(tpkg, JSON.stringify({ name: '_', description: '_', repository: '_', license: 'MIT' }))
+      }
+    } catch(e) {
+      this.log(e, 'red')
     }
   }
 
