@@ -15,7 +15,7 @@ module.exports = class extends Generator {
       {
         type: 'input',
         name: 'name',
-        message: '请输入项目名称(antd-custom)：',
+        message: '请输入项目名称(antd-custom):',
         default: 'antd-custom',
         validate(name) {
           if (fs.readdirSync('.').includes(name)) return '目录已存在'
