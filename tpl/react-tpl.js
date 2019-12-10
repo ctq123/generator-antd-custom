@@ -15,8 +15,8 @@ module.exports = class extends Generator {
       {
         type: 'input',
         name: 'name',
-        message: '请输入项目名称(fe_xx)：',
-        default: 'fe_xx',
+        message: '请输入项目名称(antd-custom)：',
+        default: 'antd-custom',
         validate(name) {
           if (fs.readdirSync('.').includes(name)) return '目录已存在'
           return true
@@ -44,9 +44,17 @@ module.exports = class extends Generator {
     // 改写并复制package.json文件
     const tmplpkg = this.fs.readJSON(this.templatePath(this.tmplDir, 'package.json'), {})
     this.fs.writeJSON(this.destinationPath(name, 'package.json'), { ...tmplpkg, ...this.answers })
+    this.fs.copyTpl(this.templatePath(this.tmplDir, 'env.local.json'), this.destinationPath(name, 'env.local.json'))
+    this.fs.copyTpl(this.templatePath(this.tmplDir, 'env.dev.json'), this.destinationPath(name, 'env.dev.json'), { appName: name })
+    this.fs.copyTpl(this.templatePath(this.tmplDir, 'env.test.json'), this.destinationPath(name, 'env.test.json'), { appName: name })
+    this.fs.copyTpl(this.templatePath(this.tmplDir, 'env.pre.json'), this.destinationPath(name, 'env.pre.json'), { appName: name })
+    this.fs.copyTpl(this.templatePath(this.tmplDir, 'env.prod.json'), this.destinationPath(name, 'env.prod.json'), { appName: name })
     // 复制其他文件
     fs.readdirSync(this.templatePath(this.tmplDir))
-    .filter(item => item !== 'package.json')
+    .filter(item => 
+      item !== 'package.json' &&
+      !item.startsWith('env.')
+    )
     .forEach(item => {
       let desItem = item
       // 由于原项目模板.gitignore发布后命名会被npm过滤和修改，需要调整回来
