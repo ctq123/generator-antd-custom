@@ -2,6 +2,8 @@
 
 ---
 
+### 预览：https://awesome-goldstine-efd4b4.netlify.com/#/app/exchange
+
 ## 说明
 
 generator-antd-custom 脚手架，用于快递搭建新项目，实现自定义命令行，配合antd-custom-tpl模板运行，实现模版和脚手架分离，暂时只提供一个react项目模版，后续可以加入其他更多模版
@@ -11,7 +13,7 @@ master 稳定版本
 
 develop 开发版本
 
-test yeoman命令版本 
+test  使用yeoman命令的版本 
 
 
 ## 安装
